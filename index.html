@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Star Wars Planets Directory</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header>
+    <h1>Star Wars Planets Directory</h1>
+  </header>
+  <img id="image" src="image/Star-Wars-Planets.jpg" >
+  <main id="planets-list" class="container"></main>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', async function() {
+      const planetsList = document.getElementById('planets-list');
+
+      try {
+        const response = await fetch('https://swapi.dev/api/planets/?format=json');
+        const data = await response.json();
+
+        data.results.forEach(planet => {
+          const residentsList = planet.residents.map(async residentUrl => {
+            const residentResponse = await fetch(residentUrl);
+            const residentData = await residentResponse.json();
+            return `<li>${residentData.name}</li>`;
+          });
+
+          planetsList.innerHTML += `
+            <div class="planet-card">
+              <h2>${planet.name}</h2>
+              <p>Climate: ${planet.climate}</p>
+              <p>Population: ${planet.population}</p>
+              <p>Terrain: ${planet.terrain}</p>
+              <h3>Notable Residents:</h3>
+              <ul>${residentsList}</ul>
+            </div>
+          `;
+        });
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+    });
+  </script>
+</body>
+</html>
